@@ -16,16 +16,21 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 // CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN, // only frontend allowed
+  origin: process.env.CORS_ORIGIN, // frontend URL
   credentials: true                 // allow cookies / auth headers
 }));
 
+// Cookies
 app.use(cookieParser());
+
+// Serve static files (if any)
 app.use(express.static(`${__dirname}/public`));
+
+// Routes
 app.use("/", router);
 
 // MongoDB connection
-const PORT = process.env.BACKEND_PORT || 8080;
+const PORT = process.env.PORT || 8080; // Use Render's dynamic port
 
 async function connectDB() {
   try {
@@ -34,12 +39,13 @@ async function connectDB() {
       useUnifiedTopology: true,
       autoIndex: true
     });
-    console.log(`MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
+    console.log(`MongoDB connected! DB HOST: ${connectionInstance.connection.host}`);
   } catch (error) {
-    console.error("MONGODB connection FAILED:", error);
-    process.exit(1);
+    console.error("MongoDB connection FAILED:", error);
+    process.exit(1); // Exit if DB connection fails
   }
 }
+
 connectDB();
 
 mongoose.connection.once("open", () => {
@@ -48,7 +54,7 @@ mongoose.connection.once("open", () => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log("Server is running on port:", PORT);
+  console.log(`Server is running on port: ${PORT}`);
 });
 
 module.exports = app;
